@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%227%22 fill=%22%230b7464%22/%3E%3Ccircle cx=%225%22 cy=%227%22 r=%223%22 fill=%22%233446c7%22/%3E%3Ccircle cx=%2227%22 cy=%2226%22 r=%223%22 fill=%22%23b07800%22/%3E%3C/svg%3E">
+<title>Muhammad Wasay</title>
+<meta name="description" content="AI Software Engineer building autonomous agents and knowledge-graph reasoning systems.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: ink on paper, left-aligned on a 12-col measure. One loud element: the knowledge graph as a full-bleed band.
+   Everything else is unboxed type; colour appears only as node-type dots, so the page shares the graph's colour language.
+   Type: Recursive only. Casual axis for display, linear for text, mono axis reserved for real graph code (Cypher, property keys). */
+:root{
+  --paper:#f3f4f0; --surface:#ffffff; --sunk:#e8eae4; --ink:#1b2230; --muted:#59626f; --faint:#8a929c; --line:#d8dbd3;
+  --accent:#0b7464; --accent-ink:#ffffff; --accent-soft:#dcefe9;
+  --c-person:#1b2230; --c-role:#3446c7; --c-area:#8a4fd0; --c-system:#0b7464; --c-project:#b07800; --c-skill:#8a929c; --c-education:#c23b6a;
+  --edge:#d0d4cc; --edge-strong:#959ca3; --dot:#e2e5de;
+  --f:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --casual:normal; --linear:normal;
+  --s-1:.8rem; --s0:1rem; --s1:1.25rem; --s2:1.563rem; --s3:1.953rem; --s4:2.441rem;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#11161a; --surface:#171e23; --sunk:#1d252b; --ink:#e4e8ea; --muted:#9ca6ae; --faint:#6d7881; --line:#28323a;
+  --accent:#45c6aa; --accent-ink:#0d1a17; --accent-soft:#16302b;
+  --c-person:#e4e8ea; --c-role:#8b98ff; --c-area:#bd97f2; --c-system:#45c6aa; --c-project:#e9b23d; --c-skill:#8e99a3; --c-education:#f07ea3;
+  --edge:#2a343c; --edge-strong:#5d6a74; --dot:#1f282e; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#11161a; --surface:#171e23; --sunk:#1d252b; --ink:#e4e8ea; --muted:#9ca6ae; --faint:#6d7881; --line:#28323a;
+  --accent:#45c6aa; --accent-ink:#0d1a17; --accent-soft:#16302b;
+  --c-person:#e4e8ea; --c-role:#8b98ff; --c-area:#bd97f2; --c-system:#45c6aa; --c-project:#e9b23d; --c-skill:#8e99a3; --c-education:#f07ea3;
+  --edge:#2a343c; --edge-strong:#5d6a74; --dot:#1f282e; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f);font-variation-settings:var(--linear);font-size:1.0625rem;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1px}
+button{font:inherit;color:inherit;font-variation-settings:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{margin:0;text-wrap:balance;font-variation-settings:var(--casual);line-height:1.1}
+h2{font-size:var(--s3);font-weight:780;letter-spacing:-.015em}
+h3{font-size:var(--s1);font-weight:720}
+p{margin:0}
+code,.code{font-family:var(--f-mono);font-size:.86em}
+.muted{color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;display:inline-block}
+.link{border:0;background:none;padding:0;color:var(--accent);cursor:pointer;font-size:var(--s-1);font-weight:560;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.link:hover{text-decoration-thickness:2px}
+a.link{display:inline}
+
+/* nav + hero */
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px 24px;padding-block:20px;flex-wrap:wrap}
+.nav .handle{font-weight:650;font-variation-settings:var(--casual)}
+.nav nav{display:flex;gap:4px 20px;flex-wrap:wrap}
+.nav nav a{color:var(--muted);text-decoration:none;font-size:.95rem}
+.nav nav a:hover{color:var(--ink)}
+.hero{padding-block:clamp(24px,5vw,64px) 40px;display:grid;gap:28px}
+.hero h1{font-size:clamp(3rem,1.4rem + 7vw,6.6rem);font-weight:880;letter-spacing:-.04em;line-height:.9;letter-spacing:-.035em}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px 56px;align-items:start}
+.lede{font-size:var(--s1);line-height:1.45;max-width:36ch;font-weight:430}
+.lede + p{margin-top:14px;color:var(--muted);max-width:58ch}
+.reach{display:grid;gap:12px;font-size:.95rem}
+.reach .open{display:flex;gap:10px;align-items:baseline;font-weight:600}
+.reach .open .dot{background:var(--c-system);transform:translateY(-1px)}
+.reach dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 18px;margin:0}
+.reach dt{color:var(--muted)}
+.reach dd{margin:0;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;min-width:0}
+.reach dd .v{user-select:all;overflow-wrap:anywhere}
+.copy{border:1px solid var(--line);background:var(--surface);border-radius:5px;font-size:.75rem;padding:1px 8px;cursor:pointer;color:var(--muted)}
+.copy:hover{color:var(--ink);border-color:var(--edge-strong)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;font-weight:650;font-size:.95rem;text-decoration:none;background:var(--ink);color:var(--paper);justify-self:start}
+.btn:hover{background:var(--accent);color:var(--accent-ink)}
+
+/* the graph band: the one loud element */
+.band{background:var(--surface);border-block:1px solid var(--line)}
+.band .wrap{max-width:1440px;padding-block:22px 28px}
+.band-head{display:flex;justify-content:space-between;align-items:end;gap:12px 32px;flex-wrap:wrap;margin-bottom:16px}
+.band-head p{color:var(--muted);max-width:62ch;margin-top:6px;font-size:.95rem}
+.toolbar{display:flex;gap:10px 18px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.search{position:relative;flex:1 1 240px;max-width:320px}
+.search input{width:100%;padding:9px 12px 9px 34px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:inherit;font-size:.92rem}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--faint);fill:none}
+.search ul{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 4px);margin:0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 14px 34px -16px rgba(20,30,40,.35)}
+.search li button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:7px 9px;border:0;background:none;border-radius:6px;cursor:pointer;font-size:.9rem}
+.search li button:hover,.search li button.on{background:var(--sunk)}
+.legend{display:flex;gap:2px 14px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:4px 2px;border:0;background:none;font-size:.88rem;cursor:pointer;color:var(--ink)}
+.chip[aria-pressed="false"]{color:var(--faint)}
+.chip[aria-pressed="false"] .dot{background:transparent!important;box-shadow:inset 0 0 0 1.5px var(--faint)}
+.queries{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.queries .qlabel{color:var(--muted);font-size:.9rem;margin-right:4px}
+.q{font-size:.85rem;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--paper);cursor:pointer}
+.q:hover{border-color:var(--edge-strong)}
+.q[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.kg{display:grid;grid-template-columns:minmax(0,1fr) 360px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper)}
+.kg-canvas{position:relative;height:min(76vh,760px);min-height:520px;min-width:0;background-color:var(--paper);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:24px 24px;touch-action:none}
+.kg-canvas svg{width:100%;height:100%;display:block;cursor:grab}
+.kg-canvas svg:active{cursor:grabbing}
+.zoom{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.zoom button{width:38px;height:36px;border:0;background:none;cursor:pointer;font-size:1.05rem;color:var(--muted)}
+.zoom button+button{border-top:1px solid var(--line)}
+.zoom button:hover{color:var(--ink);background:var(--sunk)}
+.banner{position:absolute;left:12px;top:12px;right:62px;pointer-events:none;display:flex}
+.banner span{font-size:.8rem;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 11px;color:var(--muted)}
+.inspector{background:var(--surface);border-left:1px solid var(--line);padding:22px 22px 26px;overflow:auto;max-height:min(76vh,760px);min-width:0}
+.inspector .kind{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.inspector h3{font-size:var(--s2);font-weight:800;margin-top:8px;letter-spacing:-.01em}
+.inspector .meta{color:var(--muted);font-size:.9rem;margin-top:4px}
+.inspector .cy{font-family:var(--f-mono);font-size:.74rem;color:var(--faint);margin-top:10px;overflow-wrap:anywhere}
+.inspector p{margin-top:14px;font-size:.95rem}
+.inspector ul.det{margin:12px 0 0;padding-left:18px;font-size:.9rem;color:var(--muted)}
+.inspector ul.det li+li{margin-top:5px}
+.kv{margin-top:16px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;font-size:.88rem;padding:12px 14px;background:var(--sunk);border-radius:8px}
+.kv dt{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);padding-top:1px}
+.kv dd{margin:0;font-weight:620;font-variant-numeric:tabular-nums}
+.rel{margin-top:20px}
+.rel h4{font-size:.95rem;font-weight:650;font-variation-settings:var(--linear)}
+.rel h5{margin:14px 0 6px;font-family:var(--f-mono);font-size:.76rem;font-weight:500;color:var(--accent)}
+.rel .list{display:flex;flex-wrap:wrap;gap:6px}
+.nbtn{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--paper);font-size:.84rem;cursor:pointer;text-align:left}
+.nbtn:hover{border-color:var(--ink)}
+pre.cypher{margin:12px 0 0;padding:12px 14px;border-radius:8px;background:var(--sunk);font-family:var(--f-mono);font-size:.78rem;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink)}
+pre.cypher b{color:var(--accent);font-weight:600}
+.ov-types{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-top:14px;font-size:.9rem}
+.ov-types div{display:flex;align-items:center;gap:8px}
+.ov-types b{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:650}
+.legend-key{margin-top:16px;display:grid;gap:8px;font-size:.88rem;color:var(--muted)}
+.legend-key div{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:center}
+.legend-key svg{width:34px;height:10px;overflow:visible}
+.hint{margin-top:18px;font-size:.85rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+
+/* svg graph */
+.lk{fill:none;transition:opacity .2s}
+.lk.tree{stroke:var(--edge-strong);stroke-width:1.3}
+.lk.uses{stroke:var(--edge);stroke-width:1}
+.lk.sem{stroke:var(--accent);stroke-width:1.2;stroke-dasharray:5 4;opacity:.55}
+.lk.lit{opacity:1;stroke-width:2}
+.lk.uses.lit{stroke:var(--edge-strong)}
+.lk.dim,.nd.dim{opacity:.09}
+.nd{cursor:pointer;transition:opacity .2s}
+.nd circle{stroke:var(--paper);stroke-width:2}
+.nd.sel circle{stroke:var(--ink);stroke-width:3}
+.nd text{font-family:var(--f);font-variation-settings:var(--linear);fill:var(--ink);paint-order:stroke;stroke:var(--paper);stroke-width:3.5px;stroke-linejoin:round;pointer-events:none}
+.nd.t-skill text{fill:var(--muted)}
+.nd.t-person text{font-variation-settings:var(--casual);font-weight:850}
+.nd.t-role text,.nd.t-area text,.nd.t-project text{font-weight:650;font-variation-settings:var(--casual)}
+.nd:focus{outline:none}
+.nd:focus-visible circle{stroke:var(--accent);stroke-width:3}
+.el{font-family:var(--f-mono);font-size:9px;fill:var(--accent);paint-order:stroke;stroke:var(--paper);stroke-width:3px;pointer-events:none}
+@keyframes kgin{from{opacity:.08}}
+.kg-intro .nd{animation:kgin .55s ease-out backwards;animation-delay:var(--d,0ms)}
+.kg-intro .lk{animation:kgin .8s ease-out backwards;animation-delay:420ms}
+
+/* sections */
+section.block{padding-block:64px 8px}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-bottom:28px;max-width:62ch}
+.sec-head p{color:var(--muted)}
+
+/* results */
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 56px;margin:0;padding:0;list-style:none}
+.results li{display:grid;grid-template-columns:8.6rem minmax(0,1fr);gap:16px;align-items:baseline;padding-block:14px;border-top:1px solid var(--line)}
+.results b{font-variation-settings:var(--casual);font-weight:820;font-size:var(--s2);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.results span{color:var(--muted);font-size:.98rem}
+
+/* work */
+.job{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px 48px;padding-block:28px;border-top:1px solid var(--line)}
+.job:first-child{border-top:0;padding-top:0}
+.job-side{display:grid;gap:4px;align-content:start}
+.job-side h3{font-size:var(--s2);font-weight:800}
+.job-side .t{font-weight:600}
+.job-side .when{color:var(--muted);font-size:.92rem;font-variant-numeric:tabular-nums}
+.job-side .link{justify-self:start;margin-top:6px}
+.job-main{min-width:0}
+.job-main .sum{max-width:64ch}
+.areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:28px}
+.area{min-width:0}
+.area h4{font-size:1.05rem;font-weight:740;display:flex;align-items:center;gap:9px}
+.area > p{margin-top:6px;font-size:.9rem;color:var(--muted)}
+.area dl{margin:14px 0 0;display:grid;gap:16px}
+.area dt{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.area dt b{font-weight:650;font-size:.98rem}
+.area dd{margin:3px 0 0;font-size:.9rem;color:var(--muted)}
+.area dd .m{display:block;margin-top:4px;color:var(--ink);font-weight:560}
+.job-main ul{margin:0;padding-left:18px;max-width:64ch}
+.job-main ul li+li{margin-top:6px}
+
+/* projects */
+.prow{display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px 48px;padding-block:32px;border-top:1px solid var(--line)}
+.prow:first-child{border-top:0;padding-top:0}
+.pside{display:grid;gap:6px;align-content:start}
+.pside h3{font-size:var(--s2);font-weight:820;letter-spacing:-.01em;display:flex;gap:10px;align-items:baseline}
+.pside h3 .dot{background:var(--c-project);transform:translateY(-3px)}
+.pside .meta{color:var(--muted);font-size:.92rem}
+.pside .head{font-weight:650;margin-top:8px}
+.pside .links{display:flex;gap:18px;margin-top:8px;flex-wrap:wrap}
+.pmain{min-width:0;display:grid;gap:16px;align-content:start}
+.pmain > p{max-width:66ch}
+.pmain ul{margin:0;padding-left:18px;color:var(--muted);max-width:66ch;font-size:.96rem}
+.pmain ul li+li{margin-top:5px}
+.built{font-size:.9rem;color:var(--muted);max-width:72ch}
+.built b{color:var(--ink);font-weight:600}
+.comps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 28px}
+.comp{display:grid;gap:3px;text-align:left;padding:0;border:0;background:none;cursor:pointer;min-width:0}
+.comp b{font-weight:680;display:flex;align-items:center;gap:8px}
+.comp b .dot{background:var(--c-system)}
+.comp span{font-size:.88rem;color:var(--muted);line-height:1.45}
+.comp:hover b{color:var(--accent)}
+.bench{display:grid;gap:10px;padding:18px 20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;max-width:640px}
+.bench h4{font-size:1rem;font-weight:680;font-variation-settings:var(--linear)}
+.bench p{font-size:.86rem;color:var(--muted)}
+.blegend{display:flex;gap:18px;font-size:.84rem;color:var(--muted)}
+.blegend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.brow{display:grid;grid-template-columns:132px minmax(0,1fr) 46px;gap:3px 12px;align-items:center}
+.brow .bn{font-size:.86rem;grid-row:span 2}
+.bt{height:8px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.bt div{height:100%;border-radius:4px}
+.bv{font-size:.76rem;text-align:right;font-variant-numeric:tabular-nums}
+.bv.muted{color:var(--faint)}
+
+/* skills */
+.skills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px 48px}
+.sg{min-width:0}
+.sg h3{font-size:1.05rem;font-weight:720;margin-bottom:10px}
+.sg .list{display:flex;flex-wrap:wrap;gap:4px 16px}
+.sk{display:inline-flex;align-items:baseline;gap:5px;padding:2px 0;border:0;background:none;font-size:.95rem;cursor:pointer;text-align:left}
+.sk:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.sk sup{font-size:.68rem;color:var(--faint);font-variant-numeric:tabular-nums;top:-.45em;position:relative;vertical-align:baseline}
+
+/* education + footer */
+.edu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 48px}
+.edu div{display:grid;gap:3px}
+.edu b{font-variation-settings:var(--casual);font-weight:760;font-size:var(--s1)}
+.edu span{color:var(--muted)}
+footer{margin-top:72px;background:var(--ink);color:var(--paper)}
+footer .wrap{padding-block:56px 64px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px 48px;align-items:end}
+footer h2{font-size:clamp(2.2rem,1.4rem + 3vw,3.6rem);font-weight:860;letter-spacing:-.03em}
+footer p{color:color-mix(in srgb,var(--paper) 72%,transparent);margin-top:12px;max-width:52ch}
+footer .mail{display:flex;gap:12px;align-items:baseline;margin-top:18px;font-size:var(--s1);font-weight:600;flex-wrap:wrap}
+footer .mail .v{user-select:all;overflow-wrap:anywhere}
+footer .copy{background:transparent;color:var(--paper);border-color:color-mix(in srgb,var(--paper) 35%,transparent)}
+footer .fine{max-width:30ch;justify-self:end;font-size:.85rem;color:color-mix(in srgb,var(--paper) 60%,transparent);text-align:right}
+
+@media (max-width:1000px){
+  .hero-grid{grid-template-columns:1fr}
+  .kg{grid-template-columns:1fr}
+  .kg-canvas{height:520px;min-height:0}
+  .inspector{border-left:0;border-top:1px solid var(--line);max-height:none}
+  .areas{grid-template-columns:1fr;gap:24px}
+  .job,.prow{grid-template-columns:1fr;gap:14px}
+  .skills{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .results{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .skills,.edu,.comps{grid-template-columns:1fr}
+  .kg-canvas{height:440px}
+  .results li{grid-template-columns:1fr;gap:2px}
+  footer .wrap{grid-template-columns:1fr}
+  footer .fine{text-align:left;justify-self:start}
+  section.block{padding-block:48px 0}
+}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav">
+    <span class="handle">wasay03</span>
+    <nav aria-label="Sections">
+      <a href="#graph">Graph</a><a href="#work">Work</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#contact">Contact</a>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <h1>Muhammad Wasay</h1>
+    <div class="hero-grid">
+      <div>
+        <p class="lede">I build autonomous agents that read a knowledge graph before they act.</p>
+        <p>I'm an AI Software Engineer at Codet.ai in Karachi. My agents design tenant databases, write and test their APIs, and ship them as pipelines. Underneath them sits a layer I also built: a causal knowledge graph, a policy engine and a prompt compiler that decide what each agent sees and may do.</p>
+      </div>
+      <div class="reach">
+        <div class="open"><span class="dot" aria-hidden="true"></span>Open to AI Engineer, Agentic AI Engineer and Software Engineer roles</div>
+        <dl>
+          <dt>Email</dt><dd><span class="v" id="email">wasay.arham@gmail.com</span><button class="copy" type="button" data-copy="email">Copy</button></dd>
+          <dt>Phone</dt><dd><span class="v">+92 322 3753242</span></dd>
+          <dt>GitHub</dt><dd><a class="v" href="https://github.com/wasay03" target="_blank" rel="noopener">github.com/wasay03</a></dd>
+          <dt>LinkedIn</dt><dd><a class="v" href="https://www.linkedin.com/in/muhammad-wasay-b865222b4" target="_blank" rel="noopener">linkedin.com/in/muhammad-wasay</a></dd>
+        </dl>
+        <a class="btn" href="#graph">Explore my work as a graph</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<section class="band" id="graph" aria-labelledby="graph-title">
+  <div class="wrap">
+    <div class="band-head">
+      <div>
+        <h2 id="graph-title">My work as a knowledge graph</h2>
+        <p id="graph-sub">Roles, systems, projects and skills as typed nodes and edges. Select a node to see what it connects to, or run a query.</p>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="Find a node, like DPO" autocomplete="off" aria-label="Find a node" aria-controls="search-results">
+        <ul id="search-results" role="listbox" hidden></ul>
+      </div>
+      <div class="legend" id="legend" aria-label="Show or hide node types"></div>
+    </div>
+    <div class="queries" id="queries"><span class="qlabel">Try a query</span></div>
+    <div class="kg">
+      <div class="kg-canvas" id="canvas">
+        <svg id="kg-svg" role="img" aria-label="Interactive knowledge graph of Muhammad Wasay's experience"></svg>
+        <div class="banner" id="banner" hidden><span id="banner-text"></span></div>
+        <div class="zoom">
+          <button type="button" id="z-in" aria-label="Zoom in">+</button>
+          <button type="button" id="z-out" aria-label="Zoom out">−</button>
+          <button type="button" id="z-fit" aria-label="Fit graph" title="Fit graph">⤢</button>
+        </div>
+      </div>
+      <aside class="inspector" id="inspector" aria-live="polite"></aside>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <section class="block" id="results" aria-labelledby="results-title">
+    <div class="sec-head"><h2 id="results-title">Results</h2></div>
+    <ul class="results">
+      <li><b>15+</b><span>tenants run on the platform, each with its own backend and web app.</span></li>
+      <li><b>&lt;30 min</b><span>to set up a tenant's API pipeline, down from days, with the workflow agent.</span></li>
+      <li><b>~85%</b><span>fewer bugs in user-defined functions after symbolic-execution validation.</span></li>
+      <li><b>~78%</b><span>of generated code passes its tests on the first try; automated diagnosis fixes 95%+ of the rest within three iterations.</span></li>
+      <li><b>&lt;15 ms</b><span>to authorize a request with RBAC, PBAC and ABAC across 40+ endpoints, in one stored procedure.</span></li>
+      <li><b>~40%</b><span>lower endpoint latency on the tenant and filestore APIs.</span></li>
+      <li><b>0.925</b><span>impact F1 for TraceGraph against 0.394 for a grep baseline on 17 seeded tasks.</span></li>
+      <li><b>+17.6%</b><span>BLEU after supervised fine-tuning of TinyLlama-1.1B with LoRA.</span></li>
+    </ul>
+  </section>
+
+  <section class="block" id="work" aria-labelledby="work-title">
+    <div class="sec-head"><h2 id="work-title">Work</h2></div>
+    <div id="jobs"></div>
+  </section>
+
+  <section class="block" id="projects" aria-labelledby="projects-title">
+    <div class="sec-head"><h2 id="projects-title">Projects</h2></div>
+    <div id="proj"></div>
+  </section>
+
+  <section class="block" id="skills" aria-labelledby="skills-title">
+    <div class="sec-head"><h2 id="skills-title">Skills</h2><p>The small number after a skill counts the systems and projects in the graph that use it. Select one to see them.</p></div>
+    <div class="skills" id="skill-groups"></div>
+  </section>
+
+  <section class="block" id="education" aria-labelledby="edu-title">
+    <div class="sec-head"><h2 id="edu-title">Education</h2></div>
+    <div class="edu">
+      <div><b>BS Computer Science</b><span>Institute of Business Administration (IBA), Karachi, 2021 to 2025</span><span>CGPA 3.34 out of 4.0</span></div>
+      <div><b>A Levels</b><span>Highbrow College, 2019 to 2021</span><span>Grades: 1A*, 2A</span></div>
+    </div>
+  </section>
+</div>
+
+<footer id="contact">
+  <div class="wrap">
+    <div>
+      <h2>Building agents? Let's talk.</h2>
+      <p>I'm looking for AI engineering, agentic AI and software engineering roles. Email is the fastest way to reach me.</p>
+      <div class="mail"><span class="v" id="email2">wasay.arham@gmail.com</span><button class="copy" type="button" data-copy="email2">Copy</button></div>
+    </div>
+    <div class="fine" id="fine"></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+(function(){
+"use strict";
+const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------------- data ---------------- */
+const TYPES = {
+  person:{label:'Person'}, role:{label:'Role'}, education:{label:'Education'}, area:{label:'Area'},
+  system:{label:'System'}, project:{label:'Project'}, skill:{label:'Skill'}
+};
+const N = [
+  {id:'wasay',t:'person',label:'Muhammad Wasay',meta:'AI Software Engineer, Karachi, Pakistan',
+   desc:'Builds autonomous agents and the knowledge-graph reasoning layer that governs them, on a multi-tenant SaaS platform.'},
+  {id:'codet',t:'role',label:'Codet.ai',meta:'AI Software Engineer, July 2025 to now',
+   desc:'Autonomous AI agents and neurosymbolic reasoning for a multi-tenant SaaS platform that provisions an isolated business backend for every tenant.',
+   metrics:{active_tenants:'15+',tenant_setup:'days → <30 min'}},
+  {id:'thecoded',t:'role',label:'TheCoded',meta:'Software Development Intern, July 2024 to January 2025',
+   desc:'Built SaaS solutions on Microsoft Power Platform and worked across the full software development lifecycle.',
+   details:['Requirements, system design, development, testing, deployment and maintenance']},
+  {id:'iba',t:'education',label:'IBA Karachi',meta:'BS Computer Science, 2021 to 2025',desc:'Institute of Business Administration, Karachi.',metrics:{cgpa:'3.34 / 4.0'}},
+  {id:'highbrow',t:'education',label:'Highbrow College',meta:'A Levels, 2019 to 2021',desc:'A Level studies.',metrics:{grades:'1A* 2A'}},
+
+  {id:'agents_area',t:'area',label:'Autonomous Agents',meta:'Codet.ai',
+   desc:'Agents that design tenant databases, write and test code, and wire both into tenant API pipelines.'},
+  {id:'kg_area',t:'area',label:'Knowledge Graph & Reasoning',meta:'Codet.ai',
+   desc:'The neurosymbolic layer: a causal graph of every platform resource, plus the retrieval, reasoning, policy and prompt systems built on it.'},
+  {id:'iam_area',t:'area',label:'Platform & IAM',meta:'Codet.ai',
+   desc:'Access control and the core platform APIs every tenant depends on.'},
+
+  {id:'db_agent',t:'system',label:'Database Agent',meta:'Autonomous Agents',
+   desc:'Designs and provisions tenant schemas on YugabyteDB.'},
+  {id:'symexec',t:'system',label:'Symbolic Execution Engine',meta:'Autonomous Agents',
+   desc:'Validates user-defined functions by proving their execution paths with a SAT solver and reaching full branch coverage.',
+   metrics:{branch_coverage:'100%',udf_bugs:'~85% fewer'}},
+  {id:'coding_agent',t:'system',label:'Python Coding Agent',meta:'Autonomous Agents',
+   desc:'Generates Python modules and APIs from natural-language specs through a behaviour-driven (BDD) pipeline.',
+   details:['Automated failure diagnosis repairs most failing tests without a human in the loop'],
+   metrics:{first_pass_tests:'~78%',auto_fixed:'95%+ in ≤3 iterations'}},
+  {id:'workflow_agent',t:'system',label:'Workflow Agent',meta:'Autonomous Agents',
+   desc:'Orchestrates the database agent and the coding agent into complete tenant API pipelines.',
+   metrics:{setup_time:'days → <30 min',tenants:'15+ active'}},
+  {id:'causal_kg',t:'system',label:'Causal Hierarchical KG',meta:'Knowledge Graph & Reasoning',
+   desc:'The complete causal hierarchical knowledge graph, with ontologies covering every platform resource.'},
+  {id:'graph_reasoning',t:'system',label:'Graph Reasoning System',meta:'Knowledge Graph & Reasoning',
+   desc:'Hands each agent a scoped subgraph and the constraints that apply to it before it acts.'},
+  {id:'kg_retrieval',t:'system',label:'High-Precision KG Retrieval',meta:'Knowledge Graph & Reasoning, in development',
+   desc:'Targets top-1 precision by scoping coarse-to-fine through the graph instead of ranking a flat list by cosine similarity.'},
+  {id:'policy_engine',t:'system',label:'Policy Engine',meta:'Knowledge Graph & Reasoning',
+   desc:'Policies registered in the graph, with finite-state-machine validation of every agent action and state transition.'},
+  {id:'prompt_compiler',t:'system',label:'Prompt Compiler',meta:'Knowledge Graph & Reasoning',
+   desc:'Retrieves prompt subgraphs by role and task, then merges in similarity-matched skills and memory.',
+   details:['Scores and pools subgraphs into modality-aware prompts: JSON, code, voice and image','Feeds GEPA-style prompt evolution']},
+  {id:'iam_proc',t:'system',label:'IAM Stored Procedure',meta:'Platform & IAM',
+   desc:'RBAC, PBAC and ABAC for every endpoint, resolved in a single stored procedure.',
+   metrics:{endpoints:'40+',latency:'<15 ms'}},
+  {id:'platform_apis',t:'system',label:'Tenant & Filestore APIs',meta:'Platform & IAM',
+   desc:'Tenant hierarchy and filestore APIs, with dependency injection and rate limiting.',
+   metrics:{endpoint_latency:'~40% lower'}},
+  {id:'school_app',t:'system',label:'School Management App',meta:'TheCoded, UAE client',
+   desc:'A school management application built on Microsoft Power Platform for a client in the UAE.'},
+
+  {id:'tracegraph',t:'project',label:'TraceGraph',meta:'Code knowledge graph and verified coding agent',
+   desc:'Turns a Python service (FastAPI, SQLAlchemy, Alembic, pytest) into a typed, versioned knowledge graph. A reasoning engine answers multi-hop, aggregate and negated questions over it with a derivation for every answer, an impact analyzer predicts what a change will break, and a bounded coding agent must plan, get approval and verify against the graph before it reports.',
+   details:['Closed ontology of 29 node and 36 edge types, versioned per snapshot so older states stay queryable','Regular path queries compiled to an NFA, three-valued negation over coverage holes, and Datalog-style rules with provenance','Change impact classified as BREAKS, AT_RISK, GUARDED or UNKNOWN, never "safe" when the extractor could not see','Every read and write goes through 38 PostgreSQL stored functions, traced end to end with OpenTelemetry'],
+   metrics:{impact_f1:'0.925 vs 0.394 (grep)',impact_recall:'1.000',obligation_recall:'1.000 vs 0.176',significance:'p = 0.0013, n = 17',tests_passing:'287'},
+   headline:'0.925 impact F1 vs 0.394 for grep'},
+  {id:'tg_kg',t:'system',label:'Versioned Code Graph',meta:'TraceGraph',
+   desc:'An eight-pass extraction pipeline (structure, call resolution, SQLAlchemy, FastAPI, Alembic, SQL, local facts, pytest) writes nodes, edges and line-level evidence for each snapshot.',
+   details:['Every edge carries an epistemic tier: asserted, observed, derived, inferred or hypothesized','Places the extractor cannot see through, like dynamic SQL, are stored as coverage holes','Incremental mode re-extracts only changed files and their dependents']},
+  {id:'tg_engine',t:'system',label:'Reasoning Engine',meta:'TraceGraph',
+   desc:'Evaluates a typed query IR or a small Datalog-like DSL over an in-memory snapshot. Every result is stored under a handle with its derivation, weakest tier and coverage gaps.',
+   details:['20 operators: paths, sets, negation, universal quantification, aggregates, diffs and why-not abduction','Negation returns UNKNOWN, not FALSE, when a coverage hole is in the way']},
+  {id:'tg_impact',t:'system',label:'Impact Analyzer',meta:'TraceGraph',
+   desc:'Applies a ChangeSpec to an overlay of the snapshot, runs the rule pack for each of 12 change kinds, and propagates through callers and injected dependencies up to endpoints.',
+   details:['Reports findings, obligations, tests to run and an invariant diff','Eight invariants, including tenant_id filtering on tenant tables and ORM nullability matching the migrated schema']},
+  {id:'tg_agent',t:'system',label:'Verified Coding Agent',meta:'TraceGraph',
+   desc:'A persisted state machine (intake, discover, analyze, plan, approval, implement, verify, report) with per-phase step caps, 40 phase-gated tools and an isolated git worktree per run.',
+   details:['An 8-rung verification ladder: scope, lint, migration chain, targeted and full tests, re-index invariants, plan conformance','Budgets on model calls, tool calls and tokens; an exhausted run still leaves a partial report','Provider-neutral LLM client with Gemini and Anthropic adapters, key fallback and throttling']},
+  {id:'vidsense',t:'project',label:'VidSense',meta:'Final-year project at IBA, team of five',link:'https://github.com/muazarif12/FYP',
+   desc:'A multimodal platform that answers questions about any video and turns it into other formats. It takes YouTube links or local uploads and grounds every answer in timestamped transcript chunks retrieved with RAG.',
+   details:['Generates highlights, short clips, summaries, study guides, flashcards, meeting minutes and AI podcasts','Smart dubbing and subtitling','Uses YouTube transcripts when available and falls back to Whisper large-v3-turbo','Local LLM through Ollama; query caching, lazy loading and CUDA acceleration'],
+   headline:'Q&A, highlights, dubbing, podcasts'},
+  {id:'quranqa',t:'project',label:'Quranic QA',meta:'RAG Tafseer system, team of three',link:'https://github.com/wasay03/Quranic-QA-Chatbot',
+   desc:'A retrieval-augmented question-answering system for Surah Al-Baqarah that grounds its answers in classical Tafseer and cites the passages it used.',
+   details:['Compared chunk sizes, vector stores, embeddings and search strategies','Best setup: 500-token chunks with 100 overlap in Chroma, BAAI/bge-base-en embeddings, and Qwen QwQ-32B through the Groq API','Scored for faithfulness, relevance and semantic similarity against ground truth'],
+   metrics:{avg_latency:'1.99 s',semantic_similarity:'0.90',faithfulness:'0.65'},
+   headline:'0.90 semantic similarity at 1.99 s'},
+  {id:'newscurator',t:'project',label:'Personalized News Curator',short:'News Curator',meta:'Recommendation, NLP and misinformation detection',link:'https://github.com/wasay03/Personalized-News-Curator',
+   desc:'An AI news curator that learns what each reader cares about from how they interact, ranks a personalized feed, and filters out misinformation and low-quality content.',
+   details:['Collects articles from NewsAPI, RSS feeds and scraped sources into PostgreSQL, with Redis caching','NLP pipeline with spaCy entity extraction, transformer sentiment scoring, TF-IDF features and LDA topic modelling','Learns preferences from implicit feedback (clicks, likes, shares, skips) with a per-user Random Forest, and falls back to popularity for new readers','Scores every article for source credibility and content quality, flagging sensational language and poor readability','RAG question answering over the news, with answers that cite their source articles','REST API, React frontend and Docker deployment'],
+   headline:'Personalized feed + misinformation filter'},
+  {id:'sftdpo',t:'project',label:'SFT & DPO on TinyLlama',meta:'Fine-tuning TinyLlama-1.1B',link:'https://github.com/wasay03/SFT-and-DPO-of-TInyLama',
+   desc:'Supervised fine-tuning of TinyLlama-1.1B for question answering, then preference alignment with Direct Preference Optimization.',
+   details:['SFT on 5,000 grade-school math instruction pairs; DPO on 1,976 Anthropic/hh-rlhf preference pairs','10 LoRA trials across both stages; best DPO setup was β 0.05, rank 4, learning rate 1e-6','Trained on a Kaggle T4 in about 6.5 GPU-hours'],
+   metrics:{bleu_improvement:'+17.6%',lora_trials:'10'},
+   headline:'+17.6% BLEU after SFT'}
+];
+const GROUPS = ['Languages','Agentic & LLMs','Machine Learning','Reasoning & KGs','Backend & Infra','Frontend & Tools'];
+const SK = [
+  ['python','Python',0],['sql','SQL',0],['plpgsql','PL/pgSQL',0],
+  ['langgraph','LangGraph',1],['langchain','LangChain',1],['llmorch','LLM Orchestration',1],['rag','RAG',1],['gepa','GEPA Prompt Evolution',1],['bdd','BDD Agent Pipelines',1],['llmapis','Gemini & Claude APIs',1],['ollama','Ollama',1],['ragas','RAG Evaluation',1],
+  ['pytorch','PyTorch',2],['transformers','Transformers',2],['hf','Hugging Face',2],['lora','LoRA / PEFT',2],['trl','TRL',2],['dpo','DPO',2],['sklearn','Scikit-learn',2],['faiss','FAISS',2],['whisper','Whisper',2],['sbert','Sentence Transformers',2],['spacy','spaCy',2],['chroma','ChromaDB',2],['cuda','CUDA',2],
+  ['kgs','Knowledge Graphs',3],['ontology','Ontology Design',3],['neurosym','Neurosymbolic AI',3],['symex','Symbolic Execution',3],['fsm','Policy Engines (FSM)',3],['static','Static Analysis',3],['datalog','Datalog Rules',3],
+  ['fastapi','FastAPI',4],['postgresql','PostgreSQL',4],['yugabytedb','YugabyteDB',4],['redis','Redis',4],['restapi','REST APIs',4],['multitenant','Multi-Tenant Architecture',4],['rbac','RBAC / ABAC / PBAC',4],['linux','Linux',4],['gcp','GCP Cloud Run',4],['sqlalchemy','SQLAlchemy & Alembic',4],['docker','Docker',4],['otel','OpenTelemetry',4],['pytest','pytest',4],
+  ['react','React',5],['ffmpeg','FFmpeg',5],['powerplatform','Power Platform',5],['sdlc','Full SDLC',5]
+];
+SK.forEach(([id,label,g]) => N.push({id,t:'skill',label,group:GROUPS[g]}));
+
+const E = [
+  ['wasay','codet','WORKED_AT'],['wasay','thecoded','WORKED_AT'],
+  ['wasay','iba','STUDIED_AT'],['wasay','highbrow','STUDIED_AT'],
+  ['wasay','tracegraph','BUILT'],['wasay','vidsense','BUILT'],['wasay','quranqa','BUILT'],['wasay','newscurator','BUILT'],['wasay','sftdpo','BUILT'],
+  ['tracegraph','tg_kg','INCLUDES'],['tracegraph','tg_engine','INCLUDES'],['tracegraph','tg_impact','INCLUDES'],['tracegraph','tg_agent','INCLUDES'],
+  ['tg_engine','tg_kg','READS'],['tg_impact','tg_kg','READS'],['tg_agent','tg_kg','READS'],['tg_impact','tg_agent','CHECKS'],
+  ['codet','agents_area','HAS_AREA'],['codet','kg_area','HAS_AREA'],['codet','iam_area','HAS_AREA'],
+  ['agents_area','db_agent','INCLUDES'],['agents_area','symexec','INCLUDES'],['agents_area','coding_agent','INCLUDES'],['agents_area','workflow_agent','INCLUDES'],
+  ['kg_area','causal_kg','INCLUDES'],['kg_area','graph_reasoning','INCLUDES'],['kg_area','kg_retrieval','INCLUDES'],['kg_area','policy_engine','INCLUDES'],['kg_area','prompt_compiler','INCLUDES'],
+  ['iam_area','iam_proc','INCLUDES'],['iam_area','platform_apis','INCLUDES'],
+  ['thecoded','school_app','INCLUDES'],
+  // semantic relations between systems
+  ['workflow_agent','db_agent','ORCHESTRATES'],['workflow_agent','coding_agent','ORCHESTRATES'],
+  ['graph_reasoning','causal_kg','READS'],['kg_retrieval','causal_kg','READS'],['policy_engine','causal_kg','READS'],['prompt_compiler','causal_kg','READS'],
+  ['graph_reasoning','db_agent','SCOPES'],['graph_reasoning','coding_agent','SCOPES'],['graph_reasoning','workflow_agent','SCOPES'],
+  ['policy_engine','db_agent','GOVERNS'],['policy_engine','coding_agent','GOVERNS'],['policy_engine','workflow_agent','GOVERNS'],
+  // uses
+  ...['yugabytedb','postgresql','sql','plpgsql','multitenant','llmorch'].map(k=>['db_agent',k,'USES']),
+  ...['symex','plpgsql','sql','python'].map(k=>['symexec',k,'USES']),
+  ...['python','bdd','llmorch','restapi'].map(k=>['coding_agent',k,'USES']),
+  ...['langgraph','llmorch','multitenant','restapi'].map(k=>['workflow_agent',k,'USES']),
+  ...['kgs','ontology','neurosym'].map(k=>['causal_kg',k,'USES']),
+  ...['kgs','neurosym'].map(k=>['graph_reasoning',k,'USES']),
+  ...['kgs','rag'].map(k=>['kg_retrieval',k,'USES']),
+  ...['fsm','kgs'].map(k=>['policy_engine',k,'USES']),
+  ...['gepa','kgs','llmorch'].map(k=>['prompt_compiler',k,'USES']),
+  ...['rbac','plpgsql','postgresql','yugabytedb'].map(k=>['iam_proc',k,'USES']),
+  ...['restapi','multitenant','python'].map(k=>['platform_apis',k,'USES']),
+  ['school_app','powerplatform','USES'],['thecoded','powerplatform','USES'],['thecoded','sdlc','USES'],
+  ...['python','fastapi','postgresql','plpgsql','sqlalchemy','pytest','otel'].map(k=>['tracegraph',k,'USES']),
+  ...['kgs','ontology','static'].map(k=>['tg_kg',k,'USES']),
+  ...['kgs','datalog','neurosym'].map(k=>['tg_engine',k,'USES']),
+  ...['kgs','static'].map(k=>['tg_impact',k,'USES']),
+  ...['fsm','llmapis','llmorch'].map(k=>['tg_agent',k,'USES']),
+  ...['python','pytorch','whisper','sbert','langchain','rag','chroma','faiss','ollama','fastapi','react','ffmpeg','cuda'].map(k=>['vidsense',k,'USES']),
+  ...['python','rag','chroma','faiss','sbert','llmapis','ragas'].map(k=>['quranqa',k,'USES']),
+  ...['python','postgresql','redis','sklearn','transformers','spacy','sbert','rag','chroma','restapi','react','docker'].map(k=>['newscurator',k,'USES']),
+  ...['python','pytorch','transformers','hf','lora','trl','dpo'].map(k=>['sftdpo',k,'USES']),
+  ...['linux','gcp'].map(k=>['wasay',k,'HAS_SKILL'])
+];
+const TREE = new Set(['WORKED_AT','STUDIED_AT','BUILT','HAS_AREA','INCLUDES']);
+const SEM = new Set(['ORCHESTRATES','READS','SCOPES','GOVERNS','CHECKS']);
+
+const byId = new Map(N.map(n=>[n.id,n]));
+const edges = E.filter(([s,t])=>{ const ok = byId.has(s)&&byId.has(t); if(!ok) console.warn('bad edge',s,t); return ok; })
+  .map(([s,t,type])=>({s,t,type,source:s,target:t,kind: TREE.has(type)?'tree':SEM.has(type)?'sem':'uses'}));
+const adj = new Map(N.map(n=>[n.id,new Set()]));
+edges.forEach(e=>{adj.get(e.s).add(e.t); adj.get(e.t).add(e.s);});
+N.forEach(n=>{ n.used = edges.filter(e=>e.t===n.id && e.type==='USES').length; });
+const R = n => ({person:17,role:11,education:8,area:10,project:10.5,system:8})[n.t] || Math.min(4 + n.used*1.5, 11.5);
+N.forEach(n=>n.r=R(n));
+const FS = {person:15,role:12.5,education:11,area:12,project:12.5,system:11.5,skill:10};
+
+/* ---------------- state ---------------- */
+const state = {sel:null, query:null, hover:null, hidden:new Set(), k:1};
+
+/* ---------------- graph ---------------- */
+const canvas = document.getElementById('canvas');
+const svg = d3.select('#kg-svg');
+const defs = svg.append('defs');
+defs.append('marker').attr('id','arrow').attr('viewBox','0 -4 8 8').attr('refX',7).attr('refY',0)
+  .attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto')
+  .append('path').attr('d','M0,-4L8,0L0,4Z').style('fill','var(--accent)');
+const root = svg.append('g');
+const linkG = root.append('g'), labelG = root.append('g'), nodeG = root.append('g');
+
+/* Hierarchical radial layout: each subtree of the person gets an angular sector sized by its leaves;
+   tree nodes sit on fixed rings, skills settle on the outer ring near the systems that use them. */
+edges.forEach(e=>{ e.source=byId.get(e.s); e.target=byId.get(e.t); });
+const RAD = {person:0,role:120,education:140,area:225,project:225,system:355};
+const SKILL_R = 515;
+const LEAFW = {project:2.9,education:1,system:1};
+const ORDER = ['newscurator','quranqa','vidsense','sftdpo','codet','thecoded','iba','highbrow','__gap','tracegraph'];
+const kids = id => edges.filter(e=>e.s===id && TREE.has(e.type)).map(e=>e.t);
+const weight = id => { if(id==='__gap') return 2.6; const c=kids(id); const t=byId.get(id).t;
+  return c.length ? c.reduce((a,x)=>a+weight(x),0) + (t==='area'||t==='role'||t==='project'?0.6:0) : (LEAFW[t]||1); };
+const ANG = new Map();
+function place(id,a0,a1){
+  ANG.set(id,(a0+a1)/2);
+  const c = id==='wasay' ? ORDER : kids(id), tot=c.reduce((a,x)=>a+weight(x),0); let a=a0;
+  c.forEach(x=>{ const span=(a1-a0)*weight(x)/tot; place(x,a,a+span); a+=span; });
+  if(id==='__gap') ANG.set('__gap0',a0), ANG.set('__gap1',a1);
+}
+place('wasay',-Math.PI*0.62,Math.PI*1.38);
+N.forEach(n=>{ if(n.t==='skill') return; const a=ANG.get(n.id)||0, r=RAD[n.t];
+  n.hx=n.fx=n.x=r*Math.cos(a); n.hy=n.fy=n.y=r*Math.sin(a); });
+const gapSkills = N.filter(n=>n.t==='skill' && n.used===0);
+N.filter(n=>n.t==='skill').forEach(n=>{
+  let a;
+  if(n.used===0){ const i=gapSkills.indexOf(n), g0=ANG.get('__gap0'), g1=ANG.get('__gap1'); a=g0+(g1-g0)*(i+0.5)/gapSkills.length; }
+  else { let sx=0, sy=0; edges.forEach(e=>{ if(e.t===n.id && e.type==='USES'){ const u=ANG.get(e.s); sx+=Math.cos(u); sy+=Math.sin(u); } }); a=Math.atan2(sy,sx); }
+  const r=SKILL_R + (n.used>2?-25:15);
+  n.tx=r*Math.cos(a); n.ty=r*Math.sin(a); n.x=n.tx; n.y=n.ty;
+});
+const sim = d3.forceSimulation(N)
+  .force('x', d3.forceX(d=>d.tx||0).strength(d=>d.t==='skill'?0.22:0))
+  .force('y', d3.forceY(d=>d.ty||0).strength(d=>d.t==='skill'?0.22:0))
+  .force('radial', d3.forceRadial(SKILL_R,0,0).strength(d=>d.t==='skill'?0.12:0))
+  .force('collide', d3.forceCollide(d=> d.r + (d.t==='skill'?15:22)).iterations(3))
+  .stop();
+for(let i=0;i<320;i++) sim.tick();
+
+const link = linkG.selectAll('path').data(edges).join('path')
+  .attr('class', d=>'lk '+d.kind)
+  .attr('marker-end', d=> d.kind==='sem' ? 'url(#arrow)' : null);
+const elab = labelG.selectAll('text').data(edges).join('text').attr('class','el').attr('text-anchor','middle').text(d=>d.type).style('display','none');
+const node = nodeG.selectAll('g').data(N).join('g')
+  .attr('class', d=>'nd t-'+d.t)
+  .attr('tabindex',0).attr('role','button')
+  .attr('aria-label', d=> TYPES[d.t].label+': '+d.label);
+node.append('circle').attr('r', d=>d.r).style('fill', d=>`var(--c-${d.t})`);
+node.append('text').text(d=>d.short||d.label);
+const nodeText = node.select('text');
+const RINGI = {person:0,role:1,education:1,area:2,project:2,system:3,skill:4};
+node.style('--d', d=>`${RINGI[d.t]*110}ms`);
+if(!reduced){ svg.classed('kg-intro',true); setTimeout(()=>svg.classed('kg-intro',false),1600); }
+const SIDE = d => d.t==='system' || d.t==='skill' || d.t==='education';
+function placeLabels(){
+  nodeText.each(function(d){
+    if(!SIDE(d)){ this.setAttribute('x',0); this.setAttribute('y', d.r + (d.t==='person'?19:15)); this.setAttribute('dy','0'); this.setAttribute('text-anchor','middle'); return; }
+    const left = d.x < -4;
+    this.setAttribute('x', left ? -(d.r+5) : d.r+5); this.setAttribute('y',0); this.setAttribute('dy','.35em');
+    this.setAttribute('text-anchor', left ? 'end' : 'start');
+  });
+}
+
+function draw(){
+  link.each(function(d){
+    const x1=d.source.x, y1=d.source.y; let x2=d.target.x, y2=d.target.y;
+    if(d.kind!=='sem'){ this.setAttribute('d',`M${x1},${y1}L${x2},${y2}`); return; }
+    const dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy)||1;
+    // bow the causal edges so parallel arrows separate; shorten so the arrowhead touches the node edge
+    const cut=d.target.r+4, bend=0.22*L, mx=(x1+x2)/2 - dy/L*bend, my=(y1+y2)/2 + dx/L*bend;
+    const ex=x2-mx, ey=y2-my, eL=Math.hypot(ex,ey)||1; x2-=ex/eL*cut; y2-=ey/eL*cut;
+    d.mx=mx; d.my=my;
+    this.setAttribute('d',`M${x1},${y1}Q${mx},${my} ${x2},${y2}`);
+  });
+  elab.attr('x', d=> d.kind==='sem' ? (d.source.x+d.target.x)/4 + d.mx/2 : (d.source.x+d.target.x)/2)
+      .attr('y', d=> (d.kind==='sem' ? (d.source.y+d.target.y)/4 + d.my/2 : (d.source.y+d.target.y)/2) - 3);
+  node.attr('transform', d=>`translate(${d.x},${d.y})`);
+  placeLabels();
+}
+draw();
+sim.on('tick', draw);
+
+/* zoom */
+const zoom = d3.zoom().scaleExtent([0.2,4]).on('zoom', e=>{ root.attr('transform', e.transform); state.k=e.transform.k; labels(); });
+svg.call(zoom).on('dblclick.zoom', null);
+svg.on('click', e=>{ if(e.target===svg.node()){ clearAll(); } });
+
+function fit(ids, animate){
+  const w=canvas.clientWidth, h=canvas.clientHeight; if(!w||!h) return;
+  const narrow = w < 640;
+  const list = (ids ? N.filter(n=>ids.has(n.id)) : N.filter(n=> !(narrow && (n.t==='skill'||n.t==='system')))).filter(n=>!state.hidden.has(n.t));
+  if(!list.length) return;
+  const pad=28, cap=ids?1.7:1.3;
+  let s=1, x0,y0,x1,y1;
+  for(let pass=0; pass<3; pass++){
+    x0=Infinity; y0=Infinity; x1=-Infinity; y1=-Infinity;
+    list.forEach(n=>{
+      const showLabel = ids || n.t!=='skill';
+      const fsW = Math.max(FS[n.t]*Math.sqrt(s), n.t==='skill'?9.5:10.5)/s;
+      const lw = showLabel ? (n.short||n.label).length*fsW*0.56 : 0;
+      let l=n.x-n.r, rt=n.x+n.r, bot=n.y+n.r;
+      if(SIDE(n)){ if(n.x < -4) l-=lw+5; else rt+=lw+5; }
+      else { l=Math.min(l,n.x-lw/2); rt=Math.max(rt,n.x+lw/2); bot+=fsW*1.8; }
+      x0=Math.min(x0,l); x1=Math.max(x1,rt); y0=Math.min(y0,n.y-n.r-8); y1=Math.max(y1,bot+6); });
+    s=Math.min((w-pad*2)/Math.max(x1-x0,80),(h-pad*2)/Math.max(y1-y0,80), cap);
+  }
+  const t=d3.zoomIdentity.translate(w/2,h/2).scale(s).translate(-(x0+x1)/2,-(y0+y1)/2);
+  (animate && !reduced ? svg.transition().duration(650) : svg).call(zoom.transform,t);
+}
+
+/* drag */
+node.call(d3.drag()
+  .on('start',(e,d)=>{ if(!e.active) sim.alphaTarget(0.15).restart(); d.fx=d.x; d.fy=d.y; })
+  .on('drag',(e,d)=>{ d.fx=e.x; d.fy=e.y; })
+  .on('end',(e,d)=>{ if(!e.active) sim.alphaTarget(0); if(d.t==='skill'){ d.fx=null; d.fy=null; d.tx=d.x; d.ty=d.y; } }));
+node.on('click',(e,d)=>{ e.stopPropagation(); select(d.id,false); })
+    .on('keydown',(e,d)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); select(d.id,true); } })
+    .on('mouseenter',(e,d)=>{ state.hover=d.id; apply(); })
+    .on('mouseleave',()=>{ state.hover=null; apply(); });
+
+/* highlight */
+function focus(){
+  const one = id => ({nodes:new Set([id,...adj.get(id)]), edge:e=>e.s===id||e.t===id, labels:true});
+  if(state.sel) return one(state.sel);
+  if(state.query) return {nodes:state.query.nodes, edge:e=>state.query.nodes.has(e.s)&&state.query.nodes.has(e.t)&&(!state.query.edge||state.query.edge(e)), labels:true, labelEdge:e=>e.kind!=='uses'};
+  if(state.hover) return one(state.hover);
+  return null;
+}
+function labels(){
+  const f=focus(), k=state.k;
+  nodeText.style('display', d=> {
+            if(f && f.nodes.has(d.id)) return null;
+            if(d.t==='skill') return k>=0.8 ? null : 'none';
+            if(d.t==='system') return k>=0.38 ? null : 'none';
+            if(d.t==='education' || d.t==='role') return k>=0.42 ? null : 'none';
+            return null; })
+          .style('font-size', d=> (Math.max(FS[d.t]*Math.sqrt(k), d.t==='skill'?9.5:10.5)/k).toFixed(2)+'px');
+  elab.style('font-size', (Math.max(9*Math.sqrt(k),9)/k).toFixed(2)+'px');
+}
+function apply(){
+  const f=focus(), H=state.hidden;
+  node.style('display', d=> H.has(d.t)?'none':null)
+      .classed('dim', d=> f ? !f.nodes.has(d.id) : false)
+      .classed('sel', d=> d.id===state.sel);
+  link.style('display', d=> (H.has(d.source.t)||H.has(d.target.t))?'none':null)
+      .classed('dim', d=> f ? !f.edge(d) : false)
+      .classed('lit', d=> f ? f.edge(d) : false);
+  elab.style('display', d=> (f && f.labels && f.edge(d) && (!f.labelEdge || f.labelEdge(d)) && !H.has(d.source.t) && !H.has(d.target.t)) ? null : 'none');
+  labels();
+}
+
+/* ---------------- inspector ---------------- */
+const insp = document.getElementById('inspector');
+const nb = id => { const n=byId.get(id); return `<button class="nbtn" type="button" data-node="${n.id}"><span class="dot" style="background:var(--c-${n.t})"></span>${esc(n.label)}</button>`; };
+function kv(m){ return m ? `<dl class="kv">${Object.entries(m).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` : ''; }
+function renderNode(id){
+  const n=byId.get(id);
+  const outs={}, ins={};
+  edges.forEach(e=>{ if(e.s===id)(outs[e.type]=outs[e.type]||[]).push(e.t); if(e.t===id)(ins[e.type]=ins[e.type]||[]).push(e.s); });
+  const rel = Object.entries(outs).map(([t,l])=>`<h5>-[:${t}]-&gt;</h5><div class="list">${l.map(nb).join('')}</div>`).join('')
+            + Object.entries(ins).map(([t,l])=>`<h5>&lt;-[:${t}]-</h5><div class="list">${l.map(nb).join('')}</div>`).join('');
+  insp.innerHTML = `
+    <div class="kind"><span class="dot" style="background:var(--c-${n.t})"></span>${TYPES[n.t].label}${n.group?' in '+esc(n.group):''}</div>
+    <h3>${esc(n.label)}</h3>
+    ${n.meta?`<div class="meta">${esc(n.meta)}</div>`:''}
+    <div class="cy">(:${TYPES[n.t].label} {id: "${n.id}", degree: ${adj.get(id).size}})</div>
+    ${n.desc?`<p>${esc(n.desc)}</p>`:''}
+    ${n.t==='skill'?`<p>${n.used?`Used by ${n.used} ${n.used===1?'system or project':'systems and projects'} in this graph.`:'A working skill listed on my resume.'}</p>`:''}
+    ${n.details?`<ul class="det">${n.details.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}
+    ${kv(n.metrics)}
+    ${n.link?`<p><a href="${n.link}" target="_blank" rel="noopener">Open the repository</a></p>`:''}
+    <div class="rel"><h4>Relationships</h4>${rel}</div>
+    <div class="hint">Select a related node to walk the graph, or click empty canvas to reset.</div>`;
+}
+function renderOverview(){
+  const counts={}; N.forEach(n=>counts[n.t]=(counts[n.t]||0)+1);
+  const top = N.filter(n=>n.t==='skill').sort((a,b)=>b.used-a.used).slice(0,8);
+  insp.innerHTML = `
+    <div class="kind">How to read this graph</div>
+    <h3>${N.length} nodes, ${edges.length} edges</h3>
+    <div class="cy">MATCH (n) RETURN labels(n), count(*)</div>
+    <div class="ov-types">${Object.keys(TYPES).map(t=>`<div><span class="dot" style="background:var(--c-${t})"></span>${TYPES[t].label}<b>${counts[t]||0}</b></div>`).join('')}</div>
+    <div class="legend-key">
+      <div><svg viewBox="0 0 34 10" aria-hidden="true"><line x1="0" y1="5" x2="34" y2="5" style="stroke:var(--edge-strong);stroke-width:1.6"/></svg><span>Hierarchy: me, my roles and projects, their areas and systems</span></div>
+      <div><svg viewBox="0 0 34 10" aria-hidden="true"><line x1="0" y1="5" x2="34" y2="5" style="stroke:var(--accent);stroke-width:1.4;stroke-dasharray:5 4"/></svg><span>Causal links between systems, such as what scopes or governs an agent</span></div>
+      <div><svg viewBox="0 0 34 10" aria-hidden="true"><line x1="0" y1="5" x2="34" y2="5" style="stroke:var(--edge);stroke-width:1.2"/></svg><span>A system or project uses a skill</span></div>
+    </div>
+    <div class="rel"><h4>Most-used skills</h4><div class="list" style="margin-top:8px">${top.map(n=>nb(n.id)).join('')}</div></div>
+    <div class="hint">Drag to pan, scroll or pinch to zoom, and drag a node to move it.</div>`;
+}
+function renderQuery(q){
+  const groups={}; q.nodes.forEach(id=>{ const n=byId.get(id); (groups[n.t]=groups[n.t]||[]).push(id); });
+  insp.innerHTML = `
+    <div class="kind">Query</div>
+    <h3>${esc(q.name)}</h3>
+    <pre class="cypher">${q.cypher}</pre>
+    <p>${esc(q.note)}</p>
+    <div class="rel"><h4>${q.nodes.size} nodes returned</h4>
+    ${Object.keys(TYPES).filter(t=>groups[t]).map(t=>`<h5>${TYPES[t].label}</h5><div class="list">${groups[t].map(nb).join('')}</div>`).join('')}</div>`;
+}
+insp.addEventListener('click', e=>{ const b=e.target.closest('[data-node]'); if(b) select(b.dataset.node,true); });
+
+/* ---------------- queries ---------------- */
+const out = (id,type)=>edges.filter(e=>e.s===id&&(!type||e.type===type)).map(e=>e.t);
+const K = s=>`<b>${s}</b>`;
+const QUERIES = [
+  {id:'agents',name:'Agent stack',
+   cypher:`${K('MATCH')} (:Area {name:"Autonomous Agents"})\n  -[:INCLUDES]->(s:System)-[:USES]->(k:Skill)\n${K('RETURN')} s, k`,
+   note:'The four agents I built at Codet.ai and the technology each one runs on.',
+   run(){ const s=new Set(['agents_area']); out('agents_area','INCLUDES').forEach(x=>{s.add(x); out(x,'USES').forEach(k=>s.add(k));}); return {nodes:s}; }},
+  {id:'reason',name:'Who controls the agents',
+   cypher:`${K('MATCH')} (r:System)-[:SCOPES|GOVERNS|ORCHESTRATES]->(a:System)\n${K('OPTIONAL MATCH')} (r)-[:READS]->(g)\n${K('RETURN')} r, a, g`,
+   note:'Agents never act on raw context. The reasoning system scopes what they see, the policy engine validates what they do, and the workflow agent sequences them.',
+   run(){ const s=new Set(); edges.filter(e=>e.kind==='sem').forEach(e=>{s.add(e.s);s.add(e.t);}); return {nodes:s, edge:e=>e.kind==='sem'}; }},
+  {id:'data',name:'Built on Postgres-compatible data',
+   cypher:`${K('MATCH')} (s)-[:USES]->(k:Skill)\n${K('WHERE')} k.name ${K('IN')} ["YugabyteDB","PostgreSQL","PL/pgSQL","SQL"]\n${K('RETURN')} s, k`,
+   note:'Schema design, UDF validation and access control all run close to the database.',
+   run(){ const ks=['yugabytedb','postgresql','plpgsql','sql']; const s=new Set(ks); edges.filter(e=>e.type==='USES'&&ks.includes(e.t)).forEach(e=>s.add(e.s)); return {nodes:s}; }},
+  {id:'tg',name:'Inside TraceGraph',
+   cypher:`${K('MATCH')} (:Project {name:"TraceGraph"})-[:INCLUDES]->(c:System)\n${K('OPTIONAL MATCH')} (c)-[r:READS|CHECKS|USES]->(x)\n${K('RETURN')} c, r, x`,
+   note:'Four components on one versioned code graph. The impact analyzer checks the coding agent\'s plan and patch before anything is reported as done.',
+   run(){ const s=new Set(['tracegraph']); out('tracegraph').forEach(x=>s.add(x)); out('tracegraph','INCLUDES').forEach(c=>out(c).forEach(x=>s.add(x))); return {nodes:s}; }},
+  {id:'ml',name:'Projects & their stacks',
+   cypher:`${K('MATCH')} (:Person)-[:BUILT]->(p:Project)-[:USES]->(k:Skill)\n${K('RETURN')} p, k`,
+   note:'Work outside Codet.ai: a code reasoning system, two RAG systems, a personalized news recommender, and an SFT + DPO alignment pipeline.',
+   run(){ const s=new Set(['wasay']); out('wasay','BUILT').forEach(p=>{s.add(p); out(p,'USES').forEach(k=>s.add(k));}); return {nodes:s}; }},
+  {id:'path',name:'Path to Prompt Compiler',
+   cypher:`${K('MATCH')} p = shortestPath(\n  (:Person {name:"Muhammad Wasay"})-[*]->\n  (:System {name:"Prompt Compiler"}))\n${K('RETURN')} p`,
+   note:'How a single system sits inside the hierarchy, from me down to the component.',
+   run(){ const prev=new Map([['wasay',null]]), qq=['wasay']; const dir=new Map();
+     edges.forEach(e=>{ if(!TREE.has(e.type)) return; (dir.get(e.s)||dir.set(e.s,[]).get(e.s)).push(e.t); });
+     while(qq.length){ const c=qq.shift(); if(c==='prompt_compiler') break; (dir.get(c)||[]).forEach(n=>{ if(!prev.has(n)){prev.set(n,c); qq.push(n);} }); }
+     const s=new Set(); let c='prompt_compiler'; while(c){ s.add(c); c=prev.get(c); }
+     const pairs=new Set(); s.forEach(id=>{ const p=prev.get(id); if(p) pairs.add(p+'>'+id); });
+     return {nodes:s, edge:e=>pairs.has(e.s+'>'+e.t)}; }}
+];
+const qWrap = document.getElementById('queries');
+QUERIES.forEach(q=>{ const b=document.createElement('button'); b.type='button'; b.className='q'; b.textContent=q.name; b.dataset.q=q.id; b.setAttribute('aria-pressed','false'); qWrap.appendChild(b); });
+qWrap.addEventListener('click', e=>{ const b=e.target.closest('[data-q]'); if(!b) return;
+  const q=QUERIES.find(x=>x.id===b.dataset.q);
+  if(state.query && state.query.id===q.id){ clearAll(); return; }
+  runQuery(q); });
+function runQuery(q){
+  const r=q.run(); state.sel=null; state.query={id:q.id,name:q.name,cypher:q.cypher,note:q.note,nodes:r.nodes,edge:r.edge};
+  qWrap.querySelectorAll('[data-q]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.q===q.id)));
+  renderQuery(state.query); banner(`${q.name}: ${r.nodes.size} nodes`); apply(); fit(r.nodes,true);
+}
+
+/* ---------------- selection ---------------- */
+const bannerEl=document.getElementById('banner'), bannerTx=document.getElementById('banner-text');
+function banner(t){ bannerEl.hidden=!t; bannerTx.textContent=t||''; }
+function select(id, zoomTo){
+  const n=byId.get(id); if(!n) return;
+  if(state.hidden.has(n.t)) toggleType(n.t,false);
+  state.sel=id; state.query=null;
+  qWrap.querySelectorAll('[data-q]').forEach(b=>b.setAttribute('aria-pressed','false'));
+  renderNode(id); banner(`${n.label}, ${adj.get(id).size} connections`); apply();
+  if(zoomTo) fit(new Set([id,...adj.get(id)]),true);
+}
+function clearAll(){
+  state.sel=null; state.query=null; state.hover=null;
+  qWrap.querySelectorAll('[data-q]').forEach(b=>b.setAttribute('aria-pressed','false'));
+  renderOverview(); banner(''); apply();
+}
+
+/* legend / type filter */
+const legend=document.getElementById('legend');
+Object.keys(TYPES).filter(t=>t!=='person').forEach(t=>{
+  const b=document.createElement('button'); b.type='button'; b.className='chip'; b.dataset.t=t; b.setAttribute('aria-pressed','true');
+  b.innerHTML=`<span class="dot" style="background:var(--c-${t})"></span>${TYPES[t].label}`; legend.appendChild(b); });
+function toggleType(t, hide){
+  if(hide) state.hidden.add(t); else state.hidden.delete(t);
+  const b=legend.querySelector(`[data-t="${t}"]`); if(b) b.setAttribute('aria-pressed', String(!hide));
+  if(hide && state.sel && byId.get(state.sel).t===t) clearAll(); else apply();
+}
+legend.addEventListener('click', e=>{ const b=e.target.closest('[data-t]'); if(b) toggleType(b.dataset.t, !state.hidden.has(b.dataset.t)); });
+
+/* zoom buttons */
+document.getElementById('z-in').onclick=()=>svg.transition().duration(reduced?0:250).call(zoom.scaleBy,1.35);
+document.getElementById('z-out').onclick=()=>svg.transition().duration(reduced?0:250).call(zoom.scaleBy,1/1.35);
+document.getElementById('z-fit').onclick=()=>fit(null,true);
+
+/* search */
+const sIn=document.getElementById('search'), sRes=document.getElementById('search-results'); let hits=[], hi=0;
+function showHits(){
+  const q=sIn.value.trim().toLowerCase();
+  hits = q ? N.filter(n=>n.label.toLowerCase().includes(q) || (n.desc||'').toLowerCase().includes(q)).sort((a,b)=>(b.label.toLowerCase().startsWith(q))-(a.label.toLowerCase().startsWith(q))).slice(0,7) : [];
+  hi=0;
+  if(!hits.length){ sRes.hidden = !q; sRes.innerHTML = q?'<li style="padding:8px 10px;color:var(--muted);font-size:.88rem">No matching node</li>':''; return; }
+  sRes.innerHTML=hits.map((n,i)=>`<li><button type="button" role="option" class="${i===hi?'on':''}" data-node="${n.id}"><span class="dot" style="background:var(--c-${n.t})"></span>${esc(n.label)}<span style="margin-left:auto;color:var(--faint);font-family:var(--f-mono);font-size:.7rem">${TYPES[n.t].label}</span></button></li>`).join('');
+  sRes.hidden=false;
+}
+sIn.addEventListener('input', showHits);
+sIn.addEventListener('keydown', e=>{
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){ if(!hits.length) return; e.preventDefault(); hi=(hi+(e.key==='ArrowDown'?1:-1)+hits.length)%hits.length;
+    sRes.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===hi)); }
+  if(e.key==='Enter' && hits[hi]){ e.preventDefault(); select(hits[hi].id,true); sRes.hidden=true; sIn.blur(); }
+  if(e.key==='Escape'){ sRes.hidden=true; }
+});
+sRes.addEventListener('click', e=>{ const b=e.target.closest('[data-node]'); if(b){ select(b.dataset.node,true); sRes.hidden=true; } });
+document.addEventListener('click', e=>{ if(!e.target.closest('.search')) sRes.hidden=true; });
+
+/* ---------------- sections from data ---------------- */
+function showInGraph(id){
+  document.getElementById('graph').scrollIntoView({behavior: reduced?'auto':'smooth', block:'start'});
+  setTimeout(()=>select(id,true), reduced?0:350);
+}
+document.addEventListener('click', e=>{ const b=e.target.closest('[data-show]'); if(b) showInGraph(b.dataset.show); });
+const metricChips = m => m ? `<div class="m">${Object.entries(m).map(([k,v])=>`<span>${esc(k)}: ${esc(v)}</span>`).join('')}</div>` : '';
+
+const HUMAN = {udf_bugs:'UDF bugs',first_pass_tests:'First-pass tests',auto_fixed:'Auto-fixed',setup_time:'Setup time',branch_coverage:'Branch coverage',endpoint_latency:'Endpoint latency'};
+const human = k => HUMAN[k] || k.replace(/_/g,' ').replace(/^./,c=>c.toUpperCase());
+const metricLine = m => m ? `<span class="m">${Object.entries(m).map(([k,v])=>`${esc(human(k))}: ${esc(v)}`).join('; ')}</span>` : '';
+const jobs=document.getElementById('jobs');
+const codet=byId.get('codet');
+jobs.innerHTML = `
+  <article class="job">
+    <div class="job-side">
+      <h3>Codet.ai</h3>
+      <span class="t">AI Software Engineer</span>
+      <span class="when">July 2025 to now, Karachi</span>
+      <button class="link" type="button" data-show="codet">Show in graph</button>
+    </div>
+    <div class="job-main">
+      <p class="sum">${esc(codet.desc)} The platform now serves 15+ active tenants, and tenant setup that used to take days runs in under 30 minutes.</p>
+      <div class="areas">${out('codet','HAS_AREA').map(aid=>{ const a=byId.get(aid);
+        return `<div class="area"><h4><span class="dot" style="background:var(--c-area)"></span>${esc(a.label)}</h4><p>${esc(a.desc)}</p>
+          <dl>${out(aid,'INCLUDES').map(sid=>{ const sy=byId.get(sid);
+            return `<div><dt><b>${esc(sy.label)}</b><button class="link" type="button" data-show="${sy.id}" aria-label="Show ${esc(sy.label)} in graph">Graph</button></dt>
+              <dd>${esc(sy.desc)}${sy.details?' '+sy.details.map(esc).join('. ')+'.':''}${metricLine(sy.metrics)}</dd></div>`; }).join('')}</dl>
+        </div>`; }).join('')}</div>
+    </div>
+  </article>
+  <article class="job">
+    <div class="job-side">
+      <h3>TheCoded</h3>
+      <span class="t">Software Development Intern</span>
+      <span class="when">July 2024 to January 2025</span>
+      <button class="link" type="button" data-show="thecoded">Show in graph</button>
+    </div>
+    <div class="job-main">
+      <ul>
+        <li>Built SaaS solutions on Microsoft Power Platform, including a school management app for a client in the UAE.</li>
+        <li>Worked across the full SDLC: requirements, system design, development, testing, deployment and maintenance.</li>
+      </ul>
+    </div>
+  </article>`;
+
+const proj=document.getElementById('proj');
+const stackOf = pid => { const set=new Set(out(pid,'USES')); out(pid,'INCLUDES').forEach(c=>out(c,'USES').forEach(k=>set.add(k))); return [...set]; };
+const BENCH = [['Impact F1',0.925,0.394],['Recall',1.0,0.538],['Precision',0.877,0.480],['BREAKS precision',0.912,0.280],['Obligation recall',1.0,0.176]];
+proj.innerHTML = out('wasay','BUILT').map(pid=>{ const p=byId.get(pid);
+  const comps = out(pid,'INCLUDES').map(c=>byId.get(c));
+  const feature = comps.length>0;
+  const names = stackOf(pid).map(k=>esc(byId.get(k).label));
+  return `<article class="prow">
+    <div class="pside">
+      <h3><span class="dot" aria-hidden="true"></span>${esc(p.label)}</h3>
+      <span class="meta">${esc(p.meta)}</span>
+      ${p.headline?`<span class="head">${esc(p.headline)}</span>`:''}
+      <span class="links">${p.link?`<a class="link" href="${p.link}" target="_blank" rel="noopener">Repository</a>`:''}<button class="link" type="button" data-show="${pid}">Show in graph</button></span>
+    </div>
+    <div class="pmain">
+      <p>${esc(p.desc)}</p>
+      ${feature?`<div class="comps">${comps.map(c=>`<button type="button" class="comp" data-show="${c.id}"><b><span class="dot" aria-hidden="true"></span>${esc(c.label)}</b><span>${esc(c.desc.split('. ')[0].replace(/\.$/,''))}.</span></button>`).join('')}</div>`:''}
+      <ul>${p.details.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>
+      <p class="built"><b>Built with</b> ${names.slice(0,-1).join(', ')}${names.length>1?' and ':''}${names[names.length-1]}.</p>
+      ${feature?`<div class="bench" role="group" aria-label="Impact benchmark against a grep baseline">
+        <h4>Seeded impact benchmark, 17 tasks</h4>
+        <div class="blegend"><span><i style="background:var(--c-project)"></i>TraceGraph</span><span><i style="background:var(--edge-strong)"></i>grep baseline</span></div>
+        ${BENCH.map(([n,a,b])=>`<div class="brow"><span class="bn">${n}</span><div class="bt"><div style="width:${a*100}%;background:var(--c-project)"></div></div><span class="bv">${a.toFixed(3)}</span><div class="bt"><div style="width:${b*100}%;background:var(--edge-strong)"></div></div><span class="bv muted">${b.toFixed(3)}</span></div>`).join('')}
+        <p>Wilcoxon signed-rank on F1, p = 0.0013. TraceGraph flagged coverage holes on all 4 hole tasks; grep flagged none. This benchmark runs without a model.</p>
+      </div>`:''}
+    </div>
+  </article>`; }).join('');
+
+const sg=document.getElementById('skill-groups');
+sg.innerHTML = GROUPS.map(g=>`<div class="sg"><h3>${esc(g)}</h3><div class="list">${
+  N.filter(n=>n.t==='skill'&&n.group===g).map(n=>`<button class="sk" type="button" data-show="${n.id}">${esc(n.label)}${n.used?`<sup aria-label="used by ${n.used}">${n.used}</sup>`:''}</button>`).join('')
+}</div></div>`).join('');
+
+document.getElementById('fine').textContent = `The graph above has ${N.length} nodes and ${edges.length} edges, built from my resume and repositories in November 2026.`;
+document.getElementById('graph-sub').textContent = `${N.length} nodes and ${edges.length} typed edges covering my roles, systems, projects and skills. Select a node to see what it connects to, or run a query.`;
+
+/* copy buttons */
+document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{
+  const el=document.getElementById(b.dataset.copy), txt=el.textContent.trim();
+  const done=()=>{ b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1600); };
+  const fallback=()=>{ const r=document.createRange(); r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent='Selected'; setTimeout(()=>b.textContent='Copy',1600); };
+  try{ navigator.clipboard.writeText(txt).then(done,fallback); }catch(_){ fallback(); }
+}));
+
+/* init */
+renderOverview(); apply();
+requestAnimationFrame(()=>fit(null,false));
+let rt; new ResizeObserver(()=>{ clearTimeout(rt); rt=setTimeout(()=>{ const f=focus(); fit(f?f.nodes:null,false); },120); }).observe(canvas);
+})();
+</script>
+</body>
+</html>
